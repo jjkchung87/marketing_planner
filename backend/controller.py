@@ -8,57 +8,7 @@ import csv
 import time
 import pickle
 import pandas as pd
-
-
-# *******************************************************************************************************************************
-# Process input data
-
-def process_input_data(df):
-    """Process input data"""
-
-    # Parse 'Date' and decompose it into 'year', 'month', and 'day'
-    df['Date'] = pd.to_datetime(df['Date'])
-    df['year'] = df['Date'].dt.year
-    df['month'] = df['Date'].dt.month
-    df['day'] = df['Date'].dt.day
-    df.drop('Date', axis=1, inplace=True)
-
-    # One-hot encode categorical variables
-    categorical_columns = ['Company', 'Campaign_Type', 'Target_Audience',
-                        'Channel_Used', 'Location', 'Language', 'Customer_Segment']
-    processed_df = pd.get_dummies(df, columns=categorical_columns)
-
-    # Add missing columns (if any)
-    expected_columns = ['Duration', 'Acquisition_Cost', 'year', 'month', 'day',
-       'Company_NexGen Systems', 'Campaign_Type_Display',
-       'Campaign_Type_Email', 'Campaign_Type_Influencer',
-       'Campaign_Type_Search', 'Campaign_Type_Social Media',
-       'Target_Audience_All Ages', 'Target_Audience_Men 18-24',
-       'Target_Audience_Men 25-34', 'Target_Audience_Women 25-34',
-       'Target_Audience_Women 35-44', 'Channel_Used_Email',
-       'Channel_Used_Facebook', 'Channel_Used_Google Ads',
-       'Channel_Used_Instagram', 'Channel_Used_Website',
-       'Channel_Used_YouTube', 'Location_Chicago', 'Location_Houston',
-       'Location_Los Angeles', 'Location_Miami', 'Location_New York',
-       'Language_English', 'Language_French', 'Language_German',
-       'Language_Mandarin', 'Language_Spanish',
-       'Customer_Segment_Fashionistas', 'Customer_Segment_Foodies',
-       'Customer_Segment_Health & Wellness',
-       'Customer_Segment_Outdoor Adventurers',
-       'Customer_Segment_Tech Enthusiasts']
-
-    # Ensure all expected columns are present, adding missing ones as needed
-    for col in expected_columns:
-        if col not in df.columns:
-            df[col] = False  # Add missing columns with default value (e.g., 0)
-
-    # Reorder columns to match expected format
-    processed_df = df[expected_columns]
-
-    return processed_df
-
-
-
+from models import Customer_segment, Channel, Campaign, Target_audience
 
 # *******************************************************************************************************************************
 # Load models
@@ -73,17 +23,95 @@ rf_model_path = 'prediction_models/marketing_planner_random_forest_model.sav'
 with open(rf_model_path, 'rb') as file:
     model_rf = pickle.load(file)
 
+
+# *******************************************************************************************************************************
+# Process input data
+
+def process_input_data(df):
+    """Process input data"""
+
+    # Parse 'Date' and decompose it into 'year', 'month', and 'day'
+    df['start_date'] = pd.to_datetime(df['start_date'])
+    df['year'] = df['start_date'].dt.year
+    df['month'] = df['start_date'].dt.month
+    df['day'] = df['start_date'].dt.day
+    df.drop(['start_date','name'], axis=1, inplace=True)
+
+    # One-hot encode categorical variables
+    categorical_columns = ['target_audience',
+                        'customer_segment']
+    processed_df = pd.get_dummies(df, columns=categorical_columns)
+
+
+    # Define expected columns
+    # Get list of customer segment names
+    customer_segments = Customer_segment.query.all()
+    customer_segment_names = ["customer_segment_"+segment.name for segment in customer_segments]
+
+    # Get list of channel names
+    channels = Channel.query.all()
+    channel_names = [channel.name for channel in channels]
+
+    # Get list of target audiences
+    target_audiences = Target_audience.query.all()
+    target_audience_names = ["target_audience_"+target_audience.name for target_audience in target_audiences]
+
+    # Combine all expected columns
+
+    expected_columns = ['duration',
+                        'spend_email',
+                        'spend_facebook',
+                        'spend_google_ads',
+                        'spend_instagram',
+                        'spend_website',
+                        'spend_youtube',
+                        'year',
+                        'month',
+                        'day',] + customer_segment_names + target_audience_names
+
+    # Ensure all expected columns are present, adding missing ones as needed
+    for col in expected_columns:
+        if col not in df.columns:
+            df[col] = False 
+
+    # Reorder columns to match expected format
+    processed_df = df[expected_columns]
+
+    return processed_df
+
+
+# *******************************************************************************************************************************
+# Make predictions
+
 def make_predictions(data):
     """Make predictions on data"""
 
     # Make predictions
     prediction_lr = model_lr.predict(data).tolist()[0]
     prediction_rf = model_rf.predict(data).tolist()[0]
-    prediction_mean = (prediction_lr + prediction_rf) / 2
+
+    prediction_mean = []
+
+    for i in range(len(prediction_lr)):
+        prediction_mean.append((prediction_lr[i] + prediction_rf[i]) / 2)
+    
+    # turn list into a dictionary with keys as channel names
+
+    projected_columns = ['projected_revenue_email', 
+                          'projected_revenue_facebook', 
+                          'projected_revenue_google_ads', 
+                          'projected_revenue_instagram', 
+                          'projected_revenue_website', 
+                          'projected_revenue_youtube']
+    
+    prediction_mean_dict = dict(zip(projected_columns, prediction_mean))
+
+    print("***PREDICTIONS:***", "LR:",prediction_mean_dict)
+    # prediction_mean = (prediction_lr + prediction_rf) / 2
 
     # calculate ROI
-    investment = data['Acquisition_Cost'].tolist()[0]
-    roi = prediction_mean / investment
+    # investment = data['spend_total'].tolist()[0]
+    # roi = (prediction_lr - investment) / investment
 
     # Return predictions and ROI
-    return {'prediction': prediction_mean, 'roi': roi}
+    return prediction_mean_dict
