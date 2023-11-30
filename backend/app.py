@@ -33,7 +33,7 @@ if app.config['ENV'] == 'development':
     toolbar = DebugToolbarExtension(app)
 app.app_context().push()
 connect_db(app)
-# CORS(app, resources={r"/prioritypilot/api/*": {"origins": "http://localhost:3000"}})
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 # jwt = JWTManager(app)
 
 
@@ -44,7 +44,7 @@ connect_db(app)
 # #*******************************************************************************************************************************
 # NEW CAMPAIGN
 
-@app.route('/campaign', methods=['POST'])
+@app.route('/campaigns', methods=['POST'])
 def new_campaign():
     
     # Extract data from request
@@ -84,12 +84,14 @@ def get_campaigns():
 # #*******************************************************************************************************************************
 # GET CAMPAIGN BY ID
 
-@app.route('/campaign/<int:id>', methods=['GET'])
+@app.route('/campaigns/<int:id>', methods=['GET'])
 def get_campaign_by_id(id):
     """Get campaign by id"""
 
     # Get campaign by id
     campaign = Campaign.query.get_or_404(id)
+
+    print(campaign)
 
     # Return campaign
     return jsonify(campaign=campaign.serialize()), 200
