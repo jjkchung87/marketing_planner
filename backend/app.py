@@ -43,8 +43,9 @@ CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 # #*******************************************************************************************************************************
 # NEW CAMPAIGN
+# #*******************************************************************************************************************************
 
-@app.route('/campaigns', methods=['POST'])
+@app.route('/api/campaigns', methods=['POST'])
 def new_campaign():
     
     # Extract data from request
@@ -69,8 +70,9 @@ def new_campaign():
 
 # #*******************************************************************************************************************************
 # GET ALL CAMPAIGNS
+# #*******************************************************************************************************************************
 
-@app.route('/campaigns', methods=['GET'])
+@app.route('/api/campaigns', methods=['GET'])
 def get_campaigns():
     """Get all campaigns"""
 
@@ -83,8 +85,9 @@ def get_campaigns():
 
 # #*******************************************************************************************************************************
 # GET CAMPAIGN BY ID
+# #*******************************************************************************************************************************
 
-@app.route('/campaigns/<int:id>', methods=['GET'])
+@app.route('/api/campaigns/<int:id>', methods=['GET'])
 def get_campaign_by_id(id):
     """Get campaign by id"""
 
@@ -97,9 +100,54 @@ def get_campaign_by_id(id):
     return jsonify(campaign=campaign.serialize()), 200
 
 # #*******************************************************************************************************************************
-# GET ROI BY CHANNEL
+# MODIFY A CAMPAIGN
+# #*******************************************************************************************************************************
 
-@app.route('/roi-by-channel', methods=['GET'])
+@app.route('/api/campaigns/<int:id>', methods=['PATCH'])
+def modify_campaign(id):
+    """Modify a campaign"""
+
+    # Get campaign by id
+    campaign = Campaign.query.get_or_404(id)
+
+    # Extract data from request
+    data = request.json
+
+    # Process data
+    df = pd.DataFrame(data, index=[0])
+    df = process_input_data(df)
+
+    # Make predictions
+    prediction = make_predictions(df)
+
+    # create new data object combining response data and prediction
+    data = {**data, **prediction}
+
+    # Modify campaign
+    campaign = Campaign.modify_campaign(campaign, data)
+
+    # Return campaign
+    return jsonify(campaign=campaign.serialize()), 200
+
+# #*******************************************************************************************************************************
+# DELETE A CAMPAIGN
+# #*******************************************************************************************************************************
+
+@app.route('/api/campaigns/<int:id>', methods=['DELETE'])
+def delete_campaign(id):
+    """Delete a campaign"""
+
+    #Delete by campaign ID
+    Campaign.query.filter_by(id=id).delete() 
+
+    # Return campaign
+    return jsonify('Campaign deleted'), 200
+
+
+# #*******************************************************************************************************************************
+# GET ROI BY CHANNEL
+# #*******************************************************************************************************************************
+@app.route('/api/roi-by-channel', methods=['GET'])
 def get_roi_by_channel():
     """Get ROI by channel"""
 
@@ -115,6 +163,8 @@ def get_roi_by_channel():
 
 # #*******************************************************************************************************************************
 # GET ACTUAL AND PROJECTED REVENUE BY MONTH FILTERED BY YEAR
+# #*******************************************************************************************************************************
+@app.route('/api/revenue-by-month/<int:year>', methods=['GET'])
 def get_actual_and_projected_revenue_by_month(year):
     """Get actual and projected revenue by mont filtered by year"""
     
