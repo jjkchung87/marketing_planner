@@ -4,21 +4,25 @@ import CampaignForm from './CampaignForm';
 import BarChart from './CampaignBarChart';
 import Insights from './CampaignInsights';
 import UserApi from '../../api';
-import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Unstable_Grid2';
+import { CampaignType } from '../../types/types';
+
+
 
 const Campaign = () => {
-  const { id: campaignId } = useParams(); // Rename id to campaignId
+  // get campaignID from URL params using useParams(), as a numeric value
+  const { campaignId } = useParams<{ campaignId: string }>();
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [campaign, setCampaign] = useState(null);
+  //convert campaignId to a number
+  const campaignIdNumber = Number(campaignId);
+
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [campaign, setCampaign] = useState<CampaignType | null>(null);
 
   useEffect(() => {
-    // Check if campaignId exists and is a number
-    if (campaignId && !isNaN(campaignId)) {
-      async function getCampaign(id) {
+    if (campaignId && !isNaN(Number(campaignId))) {
+      async function getCampaign(id: number): Promise<void> {
         try {
           const res = await UserApi.getCampaign(id);
           setCampaign(res.campaign);
@@ -28,23 +32,18 @@ const Campaign = () => {
           setIsLoading(false);
         }
       }
-      getCampaign(campaignId);
+      getCampaign(campaignIdNumber);
     } else {
-      // No campaignId, set campaign state to null
       setCampaign(null);
       setIsLoading(false);
     }
-  }, [campaignId]); // Include campaignId as a dependency
-
-  const addOrUpdateCampaign() => {
-    
-  }
+  }, [campaignId]);
 
   return (
     <Box sx={{ width: '100%' }}>
-        <h1>Campaign Manager</h1>
-        <h2>name: {campaign && campaign.name}</h2>
-        <h3>id: {campaign && campaign.id}</h3>
+      <h1>Campaign Manager</h1>
+      <h2>name: {campaign && campaign.name}</h2>
+      <h3>id: {campaign && campaign.id}</h3>
       <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
         <Grid xs={6}>
           <CampaignForm campaign={campaign} />
@@ -53,7 +52,7 @@ const Campaign = () => {
           {campaign && <BarChart campaign={campaign} />}
         </Grid>
         <Grid xs={6}>
-          {campaign && <Insights campaign={campaign} />}
+          {/* {campaign && <Insights campaign={campaign}/>} */}
         </Grid>
         <Grid xs={6}></Grid>
       </Grid>

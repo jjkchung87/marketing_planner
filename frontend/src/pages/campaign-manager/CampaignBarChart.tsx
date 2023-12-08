@@ -1,8 +1,13 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import transformDataForBarChart from '../../utils/transformDataForBarChart';
+import {CampaignType} from '../../types/types';
 
-const CampaignBarChart = ({ campaign={} }) => {
+type CampaignBarChartProps = {
+  campaign: CampaignType | null;
+};
+
+const CampaignBarChart: React.FC<CampaignBarChartProps> = ({ campaign }) => {
   const transformedData = transformDataForBarChart(campaign);
 
   return (

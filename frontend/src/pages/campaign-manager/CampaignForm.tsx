@@ -1,19 +1,21 @@
-import React, {useState, useEffect} from 'react'
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import Icon from '@mui/material/Icon';
+import React, {useState, useEffect, ChangeEvent, FormEvent} from 'react'
+import { Box, TextField, Button, Icon } from '@mui/material';
 import UserApi from '../../api';
 import TabPanel from './TabPanel';
+import { CampaignType, CampaignFormData } from '../../types/types';
+
+type CampaignFormProps = {
+    campaign: CampaignType | null;
+  };
 
 
-const CampaignForm = ({campaign}) => {
+const CampaignForm: React.FC<CampaignFormProps> = ({campaign}) => {
     
-    const initialFormState = {
+    const initialFormState: CampaignFormData = {
         "name":"",
         "start_date":null,
         "duration":null,
-        "customer_segment":"",
+        "customer_segment":null,
         "target_audience":"",
         "spend_email":null,
         "spend_facebook":null,
@@ -22,16 +24,28 @@ const CampaignForm = ({campaign}) => {
         "spend_website":null,
         "spend_youtube":null
     }
-    const [formData, setFormData] = useState( campaign ? campaign : initialFormState)
+    const [formData, setFormData] = useState<CampaignFormData>(initialFormState)
 
     // Update formData when the campaign prop changes
     useEffect(() => {
     if (campaign) {
-        setFormData(campaign);
+        setFormData({
+            name: campaign.name,
+            start_date: campaign.start_date,
+            duration: campaign.duration,
+            customer_segment: campaign.customer_segment,
+            target_audience: campaign.target_audience,
+            spend_email: campaign.spend_email,
+            spend_facebook: campaign.spend_facebook,
+            spend_google_ads: campaign.spend_google_ads,
+            spend_instagram: campaign.spend_instagram,
+            spend_website: campaign.spend_website,
+            spend_youtube: campaign.spend_youtube,
+            });
     }
     }, [campaign]);
 
-    const handleChange = (evt) => {
+    const handleChange = (evt:ChangeEvent<HTMLInputElement>) => {
         const {name, value} = evt.target
         setFormData(formData => (
             {...formData,
@@ -39,10 +53,10 @@ const CampaignForm = ({campaign}) => {
         ))
     }
 
-    const handleSubmit = (evt) => {
+    const handleSubmit = (evt: FormEvent) => {
         evt.preventDefault();
         if(campaign){
-            UserApi.updateCampaign(formData)
+            UserApi.updateCampaign(campaign.id, formData)
         } else {
             UserApi.addCampaign(formData)
         }
@@ -63,7 +77,7 @@ const CampaignForm = ({campaign}) => {
                     name={fieldName}
                     label={fieldName}
                     variant="outlined"
-                    value={formData[fieldName]}
+                    value={formData[fieldName as keyof CampaignFormData]}
                     onChange={handleChange}
                 />
             )
@@ -89,7 +103,7 @@ const CampaignForm = ({campaign}) => {
         <TabPanel/>
         {inputFields}
 
-        <Button variant="contained">{campaign ? Update: Add }</Button>
+        <Button variant="contained">{campaign ? "Update" : "Add" }</Button>
       </Box>
     )
 }
