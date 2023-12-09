@@ -18,10 +18,10 @@ lr_model_path = 'prediction_models/marketing_planner_linear_regression_model.sav
 with open(lr_model_path, 'rb') as file:
     model_lr = pickle.load(file)
 
-# Path to the random forest model
-rf_model_path = 'prediction_models/marketing_planner_random_forest_model.sav'
-with open(rf_model_path, 'rb') as file:
-    model_rf = pickle.load(file)
+# Path to the ridge model
+ridge_model_path = 'prediction_models/marketing_planner_ridge_model.sav'
+with open(ridge_model_path, 'rb') as file:
+    model_ridge = pickle.load(file)
 
 
 # *******************************************************************************************************************************
@@ -88,12 +88,12 @@ def make_predictions(data):
 
     # Make predictions
     prediction_lr = model_lr.predict(data).tolist()[0]
-    prediction_rf = model_rf.predict(data).tolist()[0]
+    prediction_ridge = model_ridge.predict(data).tolist()[0]
 
     prediction_mean = []
 
     for i in range(len(prediction_lr)):
-        prediction_mean.append((prediction_lr[i] + prediction_rf[i]) / 2)
+        prediction_mean.append((prediction_lr[i] + prediction_ridge[i]) / 2)
     
     # turn list into a dictionary with keys as channel names
 

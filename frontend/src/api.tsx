@@ -1,4 +1,5 @@
 import axios, { AxiosResponse, Method } from "axios";
+import {CampaignFormData, CampaignType} from "./types/types";
 
 const BASE_URL = "http://127.0.0.1:5000/api"
 
@@ -40,8 +41,9 @@ class UserApi {
     return this.request("campaigns", data, "post");
   }
 
-  static async updateCampaign(campaignId: number, data: object): Promise<ApiResponse> {
-    return this.request(`campaigns/${campaignId}`, data, "patch");
+  static async updateCampaign(campaignId: number, data: CampaignFormData ): Promise<CampaignType> {
+    const res = await this.request(`campaigns/${campaignId}`, data, "patch");
+    return res.data;
   }
 
   static async deleteCampaign(campaignId: number): Promise<ApiResponse> {
@@ -51,6 +53,11 @@ class UserApi {
   static async getCampaign(campaignId: number): Promise<any> {
     const res = await this.request(`campaigns/${campaignId}`);
     console.log(res.data);
+    return res.data;
+  }
+
+  static async getCampaigns(): Promise<any> {
+    const res = await this.request("campaigns");
     return res.data;
   }
 
