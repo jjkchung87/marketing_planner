@@ -50,3 +50,39 @@ export type CampaignType = {
     spend_youtube: number | null;
   };
     
+  // Define type for signup form data
+
+  export type SignupFormDataType = {
+    firstName: string | null;
+    lastName: string | null;
+    password: string | null;
+    email: string | null;
+    role: string | null;
+  };
+
+  // Define type for login form data
+
+  export type LoginFormDataType = {
+    password: string | null;
+    email: string | null;
+  };
+
+  // Define type for current user
+
+  export type CurrentUserType = {
+    id: number;
+    email: string;
+    first_name: string;
+    last_name: string;
+    role: string;
+  } | null;
+  
+
+  // Define UserContextType
+
+  export type UserContextType = {
+    currentUser: CurrentUserType;
+    setCurrentUser: React.Dispatch<React.SetStateAction<CurrentUserType>>;
+  };
+  
+  

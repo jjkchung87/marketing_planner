@@ -1,39 +1,39 @@
-import axios, { AxiosResponse, Method } from "axios";
-import {CampaignFormData, CampaignType} from "./types/types";
+import axios, { AxiosResponse, Method, AxiosError } from "axios";
+import {CampaignFormData, CampaignType, CurrentUserType} from "./types/types";
 
 const BASE_URL = "http://127.0.0.1:5000/api"
 
-interface ApiResponse {
-  data: any; // Define a more specific type if possible
+interface ApiResponse<T> {
+  data: T;
 }
-
-class UserApi {
+class MarketingPlannerApi {
   // Add types for your methods
 
-  static async request(endpoint: string, data: object = {}, method: Method = "get"): Promise<ApiResponse> {
+  static async request<T>(endpoint: string, data: object = {}, method: "get" | "post" | "patch" | "delete" = "get"): Promise<ApiResponse<T>> {
     const url = `${BASE_URL}/${endpoint}`;
     const params = method === "get" ? data : {};
     try {
-      const response: AxiosResponse = await axios({ url, method, data, params });
-      return response;
-    } catch (err: any) {
-      console.error("API Error:", err.response);
-      let message = err.response.data.msg;
+      const response: AxiosResponse<T> = await axios({ url, method, data, params });
+      return response.data;
+    } catch (err) {
+      const error = err as AxiosError;
+      console.error("API Error:", error.response);
+      let message = error.response?.data.msg || "An error occurred";
       throw Array.isArray(message) ? message : [message];
     }
   }
 
-  static async getCurrentUser(user_id: string): Promise<ApiResponse> {
-    return this.request(`users/${user_id}`);
+  static async getCurrentUser(user_id: string): Promise<CurrentUserType> {
+    return this.request<UserType>(`users/${user_id}`);
   }
 
   static async register(data: object): Promise<string> {
-    const res = await this.request("users/signup", data, "post");
+    const res = await this.request("users/register", data, "post");
     return res.data.access_token;
   }
 
-  static async login(data: object): Promise<string> {
-    const res = await this.request("users/login", data, "post");
+  static async signup(data: object): Promise<string> {
+    const res = await this.request("users/signup", data, "post");
     return res.data.access_token;
   }
 
