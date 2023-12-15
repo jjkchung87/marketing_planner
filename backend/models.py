@@ -3,9 +3,14 @@ from datetime import datetime
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.hybrid import hybrid_property
 from datetime import datetime, timedelta
+from flask_bcrypt import Bcrypt
 
 
 db = SQLAlchemy()
+bcrypt = Bcrypt()
+
+DEFAULT_URL = 'https://hips.hearstapps.com/hmg-prod/images/gettyimages-1226623221.jpg'
+
 
 def connect_db(app):
     db.app = app
@@ -18,6 +23,7 @@ class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    email = db.Column(db.String, nullable=False, unique=True)
     first_name = db.Column(db.String, nullable=False)
     last_name = db.Column(db.String, nullable=False)
     role = db.Column(db.String, nullable=False)
@@ -34,6 +40,36 @@ class User(db.Model):
             'last_name': self.last_name,
         }
     
+    @classmethod
+    def signup(cls, email, first_name, last_name, role, password):
+        """Sign up a new user with password hashing"""
+
+        hashed = bcrypt.generate_password_hash(password)
+        hashed_utf8 = hashed.decode("utf8")
+
+        user = User( 
+            email=email,
+            password=hashed_utf8,
+            first_name=first_name,
+            last_name=last_name,
+            role=role
+        )
+                
+        db.session.add(user)
+        db.session.commit()
+        return user
+    
+    @classmethod
+    def authenticate(cls, email, password):
+        """Authenticate user"""
+
+        user = User.query.filter_by(email=email).first()
+
+        if user and bcrypt.check_password_hash(user.password, password):
+            return user
+        else:
+            return False
+
 class Customer_segment(db.Model):
     """ Customer segment """
 

@@ -6,6 +6,7 @@ from controller import make_predictions, process_input_data
 from flask_cors import CORS
 import pickle
 import pandas as pd
+from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, jwt_required
 
 from models import db, connect_db, User, Customer_segment, Channel, Campaign, Target_audience
 
@@ -34,7 +35,7 @@ if app.config['ENV'] == 'development':
 app.app_context().push()
 connect_db(app)
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
-# jwt = JWTManager(app)
+jwt = JWTManager(app)
 
 
 
@@ -42,14 +43,105 @@ CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 # END POINTS
 
 # #*******************************************************************************************************************************
+# SIGNUP USER
+# #*******************************************************************************************************************************
+
+@app.route('/api/users/signup', methods=['POST'])
+def signup_user():
+    """Signup a user"""
+
+    # Extract data from request
+    email = request.json['email']
+    password = request.json['password']
+    first_name = request.json['firstName']
+    last_name = request.json['lastName']
+    role = request.json['role']
+
+     # Check if a user with the provided email already exists
+    existing_user = User.query.filter_by(email=email).first()
+
+    if existing_user:
+        # Return an error response if the user already exists
+        return jsonify({"message": "User with this email already exists."}), 409
+
+    if len(password) < 8 :
+        return jsonify({"message": "Password must be at least 8 characters long."}), 409
+    
+    # Add user to users table
+    user = User.signup(email, password, first_name, last_name, role)
+
+    # Create an access token with the custom payload
+    access_token = create_access_token(identity=user.id)
+
+   # Return the serialized user data along with the token in the response
+    return jsonify({"user": user.serialize(), "access_token": access_token, "message": "User signup successful!"}), 201
+    
+
+# #*******************************************************************************************************************************
+# AUTHENTICATE USER
+# #*******************************************************************************************************************************
+
+@app.route('/api/users/authenticate', methods=['POST'])
+def authenticate_user():
+    """Authenticate a user"""
+
+    # Extract data from request
+    email = request.json['email']
+    password = request.json['password']
+    
+    # Authenticate user
+    user = User.authenticate(email, password)
+
+    # Create an access token with the custom payload
+    access_token = create_access_token(identity=user.id)
+
+    if not user:
+        # Check for incorrect email/password
+        return jsonify({"message": "Incorrect email or password."}), 401
+    
+    
+
+    # Return the serialized user data along with a success response
+    return jsonify({"user": user.serialize(), "access_token": access_token, "message": "User login successful!"}), 200
+
+# #*******************************************************************************************************************************
+# GET USER
+# #*******************************************************************************************************************************
+
+@app.route('/api/users/<int:id>', methods=['GET'])
+def get_user(id):
+    """Get user by id"""
+
+    # Get user by id
+    user = User.query.get_or_404(id)
+
+    # Return user
+    return jsonify(user=user.serialize()), 200
+
+# #*******************************************************************************************************************************
 # NEW CAMPAIGN
 # #*******************************************************************************************************************************
 
 @app.route('/api/campaigns', methods=['POST'])
+@jwt_required()
 def new_campaign():
+    """Create a new campaign"""
     
+    # Get user id from access token
+    token_id = get_jwt_identity()
+
+    # Get user by id
+    user = User.query.get_or_404(token_id)
+
     # Extract data from request
     data = request.json
+
+    # Check if user is authorized to create a campaign
+    if token_id!= data['user_id']:
+        return jsonify({"message": "Not authorized."}), 401
+
+    # remove user_id from data
+    data.pop('user_id')
 
     # Process data
     df = pd.DataFrame(data, index=[0])
@@ -73,8 +165,18 @@ def new_campaign():
 # #*******************************************************************************************************************************
 
 @app.route('/api/campaigns', methods=['GET'])
+@jwt_required()
 def get_campaigns():
     """Get all campaigns"""
+
+    # Get user id from access token
+    token_id = get_jwt_identity()
+
+    # Get user by id
+    user = User.query.get(token_id)
+
+    if not user:
+        return jsonify({"message": "Not authorized."}), 401
 
     # Get all campaigns
     campaigns = Campaign.query.all()
@@ -88,13 +190,21 @@ def get_campaigns():
 # #*******************************************************************************************************************************
 
 @app.route('/api/campaigns/<int:id>', methods=['GET'])
+@jwt_required()
 def get_campaign_by_id(id):
     """Get campaign by id"""
 
+    # Get user id from access token
+    token_id = get_jwt_identity()
+
+    # Get user by id
+    user = User.query.get(token_id)
+
+    if not user:
+        return jsonify({"message": "Not authorized."}), 401
+
     # Get campaign by id
     campaign = Campaign.query.get_or_404(id)
-
-    print(campaign)
 
     # Return campaign
     return jsonify(campaign=campaign.serialize()), 200
@@ -104,9 +214,19 @@ def get_campaign_by_id(id):
 # #*******************************************************************************************************************************
 
 @app.route('/api/campaigns/<int:id>', methods=['PATCH'])
+@jwt_required()
 def modify_campaign(id):
     """Modify a campaign"""
 
+    # Get user id from access token
+    token_id = get_jwt_identity()
+
+    # Get user by id
+    user = User.query.get(token_id)
+
+    if not user:
+        return jsonify({"message": "Not authorized."}), 401
+    
     # Get campaign by id
     campaign = Campaign.query.get_or_404(id)
 
@@ -134,9 +254,19 @@ def modify_campaign(id):
 # #*******************************************************************************************************************************
 
 @app.route('/api/campaigns/<int:id>', methods=['DELETE'])
+@jwt_required()
 def delete_campaign(id):
     """Delete a campaign"""
 
+    # Get user id from access token
+    token_id = get_jwt_identity()
+
+    # Get user by id
+    user = User.query.get(token_id)
+
+    if not user:
+        return jsonify({"message": "Not authorized."}), 401
+    
     #Delete by campaign ID
     Campaign.query.filter_by(id=id).delete() 
 
