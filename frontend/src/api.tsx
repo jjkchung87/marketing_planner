@@ -8,7 +8,8 @@ interface ApiResponse<T> {
 }
 
 interface ApiErrorResponse {
-  message: string;
+  message: string | string[];
+  name: string;
   response?: {
     status?: number;
     statusText?: string;
@@ -33,7 +34,7 @@ class MarketingPlannerApi {
       return response.data;
     } catch (err) {
       const axiosError = err as AxiosError<ApiErrorResponse>;
-      let message = "An error occurred";
+      let message: string | string[] = "An error occurred";
   
       if (axiosError.response && axiosError.response.data) {
         message = axiosError.response.data.message || "An error occurred";

@@ -66,7 +66,7 @@ const Signup: React.FC<SignupProps> = ({handleSignup}) => {
           onChange={handleChange}
           value={formData.firstName || ''}
           fullWidth
-          margin="normal"
+          margin="normal"          
         />
         <TextField
           label="Last Name"
