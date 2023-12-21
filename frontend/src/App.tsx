@@ -73,16 +73,21 @@ const App: React.FC = () => {
    Handle Signup   
    *******************************************************************************************************/
 
-  const handleSignup = async (data: SignupFormDataType) => {
+   const handleSignup = async (data: SignupFormDataType) => {
     try {
       let token = await MarketingPlannerApi.signup(data);
       setToken(token);
       return { success: true };
     } catch (errors) {
       console.error("signup failed", errors);
-      return { success: false, errors };
+  
+      // Assuming 'errors' is an array of error messages. If not, adjust accordingly.
+      const errorMessages = errors instanceof Array ? errors : ["An error occurred during signup"];
+      
+      return { success: false, errors: errorMessages };
     }
   }
+  
 
   /******************************************************************************************************
    Handle Login   
@@ -91,7 +96,7 @@ const App: React.FC = () => {
    // Handle login. If successful returns { success: true } otherwise { success: false, errors: string[] }
    const handleLogin = async (data: LoginFormDataType) => {
     try {
-      let token = await MarketingPlannerApi.login(data);
+      let token = await MarketingPlannerApi.authenticate(data);
       setToken(token);
       return { success: true };
     } catch (errors) {

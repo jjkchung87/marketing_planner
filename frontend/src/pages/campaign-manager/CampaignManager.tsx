@@ -63,7 +63,7 @@ const CampaignManager = () => {
       async function getCampaigns(): Promise<void> {
         try {
           const res = await UserApi.getCampaigns();
-          setCampaigns(res.campaigns);
+          setCampaigns(res);
         } catch (error) {
           console.error('Error fetching campaign data:', error);
         } finally {
