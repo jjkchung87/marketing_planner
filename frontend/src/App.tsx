@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import MainNavBar from './components/MainNavBar';
 import Drawer from './components/Drawer';
+import Navbar from './components/Navbar';
 import './App.css';
 import Campaign from './pages/campaign-manager/CampaignManager';
 import CampaignManager from './pages/campaign-manager/CampaignManager';
@@ -11,10 +12,12 @@ import LoadingSpinner from './components/LoadingSpinner';
 import { CurrentUserType, SignupFormDataType, LoginFormDataType } from './types/types';
 import { decodeToken} from 'react-jwt';
 import Signup from './pages/signup/signup';
+import Login from './pages/login/login';
+import UserContext from './context/UserContext';
 
 // Define the expected structure of your decoded token
 interface DecodedToken {
-  username: string;
+  sub: number;
   // Add other properties from your token here as needed
 }
 
@@ -43,14 +46,15 @@ const App: React.FC = () => {
     
       async function getCurrentUser() {
         if (token) {
+          console.log("Token:", token)
           try {
             const decoded = decodeToken<DecodedToken>(token); // Use the generic parameter to specify the expected shape
             if (decoded) {
-              const { username } = decoded;
               // put the token on the Api class so it can use it to call the API.
               MarketingPlannerApi.token = token;
-              const currentUser = await MarketingPlannerApi.getCurrentUser(username);
+              const currentUser = await MarketingPlannerApi.getCurrentUser(decoded.sub);
               setCurrentUser(currentUser);
+              console.log("Current User:", currentUser)
             }
           } catch (err) {
             console.error("App loadUserInfo: problem loading", err);
@@ -124,12 +128,16 @@ const App: React.FC = () => {
 
   return (
     <div className="App">
-      <Drawer />
+      <UserContext.Provider value={{currentUser, setCurrentUser}}>
+      <Navbar handleLogout={handleLogout}/>
       <Routes>
+        <Route path="/" element={<CampaignManager />} />
         <Route path="/campaigns" element={<CampaignManager />} />
         <Route path="/campaigns/:id" element={<Campaign />} />
         <Route path="/signup" element={<Signup handleSignup={handleSignup} />} />
+        <Route path="/login" element={<Login handleLogin={handleLogin} />}/>
       </Routes>
+      </UserContext.Provider>
     </div>
   );
 };

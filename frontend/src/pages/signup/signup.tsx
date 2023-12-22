@@ -6,44 +6,35 @@ import { Box, TextField, Button, Typography } from '@mui/material';
 // import './Signup.css'
 import { SignupFormDataType } from '../../types/types';
 
-type SignupProps = {
+interface SignupProps { //define the type of props
   handleSignup: (formData: SignupFormDataType) => Promise<{ success: boolean; errors?: string[] }>;
 }
 
-const Signup: React.FC<SignupProps> = ({handleSignup}) => {
-  
-  const userContext = useContext(UserContext);
+const Signup: React.FC<SignupProps> = ({handleSignup}) => { //define component as a React Functional Component and pass in the type of props
 
-  // Check if userContext is not null before accessing currentUser
-  if (!userContext) {
-    // Handle the case where userContext is null
-    console.error("UserContext is not available.");
-    return null; // or handle this scenario appropriately
-  }
-
-  const { currentUser } = userContext;
-    const navigate = useNavigate()
-    const [formErrors, setFormErrors] = useState<string[]>([]); // Define the type of formErrors
-    const initialValue = {
-                            firstName:"Harper",
-                            lastName:"Chung",
-                            password:"harper123",
-                            email:"harper@human.com",
-                            role: "Marketing Manager"
-                        }
+  // const {currentUser} = useContext(UserContext);
+  const navigate = useNavigate()
+  const [formErrors, setFormErrors] = useState<string[]>([]); // Define the type of formErrors
+  const initialValue = {
+                          firstName:"Harper",
+                          lastName:"Chung",
+                          password:"harper123",
+                          email:"harper@human.com",
+                          role: "Marketing Manager"
+                      }
 
 
-    const [formData, handleChange, resetFormData ] = useFields(initialValue)
+  const [formData, handleChange, resetFormData ] = useFields(initialValue)
 
   /******************************************************************************************************
     Handle redirecting to homepage if currentUser
   *******************************************************************************************************/
-    useEffect(()=> {if(currentUser) navigate("/")}) 
+    // useEffect(()=> {if(currentUser) navigate("/")}) 
 
   /******************************************************************************************************
     Handle submitting signup form
   *******************************************************************************************************/
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => { // Define the type of e. 
       e.preventDefault();
       const result = await handleSignup(formData);
       if (result.success) {

@@ -39,7 +39,7 @@ const NarrowTextField = styled(StyledTextField)({
   },
 });
 
-const CampaignManager = () => {
+const CampaignManager: React.FC = () => {
 
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -64,6 +64,7 @@ const CampaignManager = () => {
         try {
           const res = await UserApi.getCampaigns();
           setCampaigns(res);
+
         } catch (error) {
           console.error('Error fetching campaign data:', error);
         } finally {
@@ -72,7 +73,7 @@ const CampaignManager = () => {
       }
       getCampaigns();
     } 
-  , [campaigns]);
+  , []);
 
   if(isLoading) return <h1>Loading...</h1>
 

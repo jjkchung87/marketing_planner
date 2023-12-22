@@ -3,9 +3,6 @@ import { CampaignFormData, CampaignType, CurrentUserType } from "./types/types";
 
 const BASE_URL = "http://127.0.0.1:5000/api";
 
-interface ApiResponse<T> {
-  data: T; 
-}
 
 interface ApiErrorResponse {
   message: string | string[];
@@ -15,7 +12,6 @@ interface ApiErrorResponse {
     statusText?: string;
     data?: {
       message?: string;
-      // Include any other properties that might be part of your error response
     };
   };
 }
@@ -27,13 +23,14 @@ class MarketingPlannerApi {
 
   static async request<T>(endpoint: string, data: object = {}, method: "get" | "post" | "patch" | "delete" = "get"): Promise<T> {
     const url = `${BASE_URL}/${endpoint}`;
+    const headers = { Authorization: `Bearer ${MarketingPlannerApi.token}` };
     const params = method === "get" ? data : {};
 
     try {
-      const response: AxiosResponse<T> = await axios({ url, method, data, params });
+      const response: AxiosResponse<T> = await axios({ url, method, data, params, headers });
       return response.data;
     } catch (err) {
-      const axiosError = err as AxiosError<ApiErrorResponse>;
+      const axiosError = err as AxiosError<ApiErrorResponse>; // Assert that err is an AxiosError
       let message: string | string[] = "An error occurred";
   
       if (axiosError.response && axiosError.response.data) {
@@ -47,7 +44,7 @@ class MarketingPlannerApi {
     }
   }
 
-  static async getCurrentUser(user_id: string): Promise<CurrentUserType> {
+  static async getCurrentUser(user_id: number): Promise<CurrentUserType> {
     return this.request<CurrentUserType>(`users/${user_id}`);
   }
 
