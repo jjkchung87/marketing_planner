@@ -79,7 +79,7 @@ const CampaignManager: React.FC = () => {
 
   return (
     <Box sx={{ width: '100%' }}>
-      <h1>Campaign Manager</h1>
+      <h1>Campaign List</h1>
       <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
         <Grid xs={12}>
         <TableContainer>

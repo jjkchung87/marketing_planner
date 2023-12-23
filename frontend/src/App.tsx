@@ -3,9 +3,12 @@ import { Routes, Route, useNavigate } from 'react-router-dom';
 import MainNavBar from './components/MainNavBar';
 import Drawer from './components/Drawer';
 import Navbar from './components/Navbar';
+import Sidebarnav from './components/Sidebarnav';
 import './App.css';
 import Campaign from './pages/campaign-manager/CampaignManager';
 import CampaignManager from './pages/campaign-manager/CampaignManager';
+import Home from './pages/home/Home';
+import CampaignForm from './pages/campaign-manager/CampaignForm';
 import MarketingPlannerApi from './api';
 import useLocalStorageState from './hooks/useLocalStorageState';
 import LoadingSpinner from './components/LoadingSpinner';
@@ -46,7 +49,6 @@ const App: React.FC = () => {
     
       async function getCurrentUser() {
         if (token) {
-          console.log("Token:", token)
           try {
             const decoded = decodeToken<DecodedToken>(token); // Use the generic parameter to specify the expected shape
             if (decoded) {
@@ -130,10 +132,12 @@ const App: React.FC = () => {
     <div className="App">
       <UserContext.Provider value={{currentUser, setCurrentUser}}>
       <Navbar handleLogout={handleLogout}/>
+      {/* <Sidebarnav /> */}
       <Routes>
-        <Route path="/" element={<CampaignManager />} />
+        <Route path="/" element={<Home />} />
         <Route path="/campaigns" element={<CampaignManager />} />
         <Route path="/campaigns/:id" element={<Campaign />} />
+        <Route path="/campaigns/add" element={<CampaignForm />} />
         <Route path="/signup" element={<Signup handleSignup={handleSignup} />} />
         <Route path="/login" element={<Login handleLogin={handleLogin} />}/>
       </Routes>

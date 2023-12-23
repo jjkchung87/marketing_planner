@@ -27,7 +27,7 @@ app.config['EXPLAIN_TEMPLATE_LOADING'] = True
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
 # app.config['JWT_SECRET_KEY'] = 'SECRET KEY FOR JWT'  # Replace with your own secret key
-# app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=24)  # Set expiration to 24 hours
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=24)  # Set expiration to 24 hours
 
 app.debug=True
 if app.config['ENV'] == 'development':
@@ -68,7 +68,11 @@ def signup_user():
         return jsonify({"message": "Password must be at least 8 characters long."}), 409
     
     # Add user to users table
-    user = User.signup(email, password, first_name, last_name, role)
+    user = User.signup(email=email, 
+                       first_name=first_name, 
+                       last_name=last_name, 
+                       password=password, 
+                       role=role)
 
     # Create an access token with the custom payload
     access_token = create_access_token(identity=user.id)
@@ -94,6 +98,8 @@ def authenticate_user():
 
     # Create an access token with the custom payload
     access_token = create_access_token(identity=user.id)
+
+    print("ACCESS TOKEN:", access_token)
 
     if not user:
         # Check for incorrect email/password
@@ -136,13 +142,6 @@ def new_campaign():
     # Extract data from request
     data = request.json
 
-    # Check if user is authorized to create a campaign
-    if token_id!= data['user_id']:
-        return jsonify({"message": "Not authorized."}), 401
-
-    # remove user_id from data
-    data.pop('user_id')
-
     # Process data
     df = pd.DataFrame(data, index=[0])
     df = process_input_data(df)
@@ -152,6 +151,8 @@ def new_campaign():
 
     # create new data object combining response data and prediction
     data = {**data, **prediction}
+
+    print('**************Data:',data)
 
     # add campaign to campaigns table
     campaign = Campaign.add_new_campaign(data)
@@ -171,6 +172,8 @@ def get_campaigns():
 
     # Get user id from access token
     token_id = get_jwt_identity()
+
+    print("TOKEN ID:", token_id)
 
     # Get user by id
     user = User.query.get(token_id)

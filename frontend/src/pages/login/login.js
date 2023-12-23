@@ -10,8 +10,8 @@ const Login = ({handleLogin}) => {
     const [formErrors, setFormErrors] = useState([]);
     const navigate = useNavigate()
     const initialValue = {
-                            email:"harper3@human.com",
-                            password:"harper123"
+                            email:"arlo@dog.com",
+                            password:"arlo12345"
                         }
 
     const [formData, handleChange, resetFormData ] = useFields(initialValue)

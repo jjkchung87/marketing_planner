@@ -77,6 +77,8 @@ def process_input_data(df):
     # Reorder columns to match expected format
     processed_df = df[expected_columns]
 
+    print("***PROCESSED DATA:***", processed_df)
+
     return processed_df
 
 
@@ -89,6 +91,7 @@ def make_predictions(data):
     # Make predictions
     prediction_lr = model_lr.predict(data).tolist()[0]
     prediction_ridge = model_ridge.predict(data).tolist()[0]
+
 
     prediction_mean = []
 
@@ -104,9 +107,11 @@ def make_predictions(data):
                           'projected_revenue_website', 
                           'projected_revenue_youtube']
     
-    prediction_mean_dict = dict(zip(projected_columns, prediction_mean))
+    # prediction_mean_dict = dict(zip(projected_columns, prediction_mean))
+    prediction_mean_dict = dict(zip(projected_columns, prediction_ridge))
+    
 
-    print("***PREDICTIONS:***", "LR:",prediction_mean_dict)
+    print("***PREDICTIONS:***", prediction_mean_dict)
     # prediction_mean = (prediction_lr + prediction_rf) / 2
 
     # calculate ROI
