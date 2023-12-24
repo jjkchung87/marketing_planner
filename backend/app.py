@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, flash, redirect, session,json
 from sqlalchemy import func, and_, case
 from datetime import datetime, timedelta
 from controller import make_predictions, process_input_data
+from controller_llm import get_chat_response
 from flask_cors import CORS
 import pickle
 import pandas as pd
@@ -318,6 +319,25 @@ def get_actual_and_projected_revenue_by_month(year):
     # Return actual and projected revenue by month
     return jsonify(actual_revenue_by_month=[dict(zip(result.keys(), result)) for result in actual_revenue_by_month],
                      projected_revenue_by_month=[dict(zip(result.keys(), result)) for result in projected_revenue_by_month]), 200
+
+# *******************************************************************************************************************************
+# POST ROUTE FOR CHATBOT
+# *******************************************************************************************************************************
+
+@app.route('/api/chatbot', methods=['POST'])
+def chatbot():
+    """Chatbot"""
+
+    # Extract data from request
+    data = request.json
+
+    # Get chat response
+    response = get_chat_response(data['prompt'])
+
+    # Return response
+    return jsonify(response=response), 200
+
+
 
 # *******************************************************************************************************************************
 # JSON Format

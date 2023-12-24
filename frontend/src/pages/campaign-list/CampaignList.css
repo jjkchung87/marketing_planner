@@ -1,0 +1,18 @@
+.smallCell {
+    padding: 6px 8px;
+    font-size: 0.75rem;
+  }
+  
+  .mediumCell {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+    width: 100px; /* Adjust the width as needed */
+  }
+  
+  /* You can also target the input fields within the cells to make them smaller */
+  .smallCell .MuiInputBase-input,
+  .mediumCell .MuiInputBase-input {
+    font-size: 0.75rem;
+    padding: 6px; /* Adjust padding as needed */
+  }
+  

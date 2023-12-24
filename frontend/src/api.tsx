@@ -1,5 +1,5 @@
 import axios, { AxiosResponse, AxiosError } from "axios";
-import { CampaignFormData, CampaignType, CurrentUserType } from "./types/types";
+import { CampaignFormData, CampaignType, CurrentUserType, ChatResponseType } from "./types/types";
 
 const BASE_URL = "http://127.0.0.1:5000/api";
 
@@ -79,6 +79,11 @@ class MarketingPlannerApi {
     const res = await this.request<{ campaigns: CampaignType[] }>("campaigns");
     return res.campaigns;
   }
-}
+
+  static async chatbot(data: object): Promise<ChatResponseType> {
+    const res = await this.request<ChatResponseType>("chatbot", data, "post");
+    return res ;
+  }
+} 
 
 export default MarketingPlannerApi;

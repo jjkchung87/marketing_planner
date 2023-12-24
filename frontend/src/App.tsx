@@ -5,8 +5,8 @@ import Drawer from './components/Drawer';
 import Navbar from './components/Navbar';
 import Sidebarnav from './components/Sidebarnav';
 import './App.css';
-import Campaign from './pages/campaign-manager/CampaignManager';
-import CampaignManager from './pages/campaign-manager/CampaignManager';
+import Campaign from './pages/campaign-list/CampaignList';
+import CampaignList from './pages/campaign-list/CampaignList';
 import Home from './pages/home/Home';
 import CampaignForm from './pages/campaign-manager/CampaignForm';
 import MarketingPlannerApi from './api';
@@ -135,7 +135,7 @@ const App: React.FC = () => {
       {/* <Sidebarnav /> */}
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/campaigns" element={<CampaignManager />} />
+        <Route path="/campaigns" element={<CampaignList />} />
         <Route path="/campaigns/:id" element={<Campaign />} />
         <Route path="/campaigns/add" element={<CampaignForm />} />
         <Route path="/signup" element={<Signup handleSignup={handleSignup} />} />

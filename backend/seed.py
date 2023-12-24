@@ -1,6 +1,4 @@
 from app import db, Customer_segment, Target_audience, User, Campaign
-
-
 import csv
 from random import randint
 from datetime import datetime, timedelta
@@ -96,11 +94,11 @@ user = User.signup(email="harper@human.com", password="harper123", first_name="H
 # Call the function with the path to your CSV file
 # seed_campaign_database('campaign_seed_data.csv')
 
-# Seed campaigns table with 50 campaigns
+# Seed campaigns table with 200 campaigns
 
-for i in range(100):
+for i in range(200):
     
-    random_start_date = datetime.strptime("2023-01-01", "%Y-%m-%d") + timedelta(days=randint(0, 500))
+    random_start_date = datetime.strptime("2022-01-01", "%Y-%m-%d") + timedelta(days=randint(0, 800))
     duration = randint(0, 60)
     today = datetime.today()
     
@@ -121,7 +119,8 @@ for i in range(100):
     projected_revenue_youtube = randint(3000, 5000)
 
     campaign = Campaign(
-        name=f"Campaign {i+1}",
+        # make campaign name "Campaign: start_date" with start_date in format "YYYY-MM-DD"
+        name=f"Campaign: {random_start_date.strftime('%Y-%m-%d')}",
         start_date=random_start_date,
         duration=duration,
         customer_segment_id=customer_segment_id,

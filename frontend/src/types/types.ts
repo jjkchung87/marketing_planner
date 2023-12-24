@@ -85,4 +85,12 @@ export type CampaignType = {
     setCurrentUser: React.Dispatch<React.SetStateAction<CurrentUserType>>;
   };
   
+  // Define chat response type
+
+  export type ChatResponseType = {
+    response: {
+      input: string;
+      output: string;
+    }
+  };  
   
