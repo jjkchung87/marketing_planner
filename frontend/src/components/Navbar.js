@@ -16,6 +16,7 @@ const Navbar = ({ handleLogout }) => {
                     <>
                         <Menu.Item as={Link} to="/campaigns" name="Campaign List" />
                         <Menu.Item as={Link} to="/campaigns/add" name="Campaign Manager" />
+                        <Menu.Item as={Link} to="/chat" name="Chat" />
                         <Menu.Item as={Link} to="/" onClick={handleLogout} name={`Logout (${currentUser.user.first_name})`} />
                     </>
                 ) : (

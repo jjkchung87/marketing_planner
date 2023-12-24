@@ -9,6 +9,7 @@ import Campaign from './pages/campaign-list/CampaignList';
 import CampaignList from './pages/campaign-list/CampaignList';
 import Home from './pages/home/Home';
 import CampaignForm from './pages/campaign-manager/CampaignForm';
+import ChatBox from './pages/chat/ChatBox';
 import MarketingPlannerApi from './api';
 import useLocalStorageState from './hooks/useLocalStorageState';
 import LoadingSpinner from './components/LoadingSpinner';
@@ -138,6 +139,7 @@ const App: React.FC = () => {
         <Route path="/campaigns" element={<CampaignList />} />
         <Route path="/campaigns/:id" element={<Campaign />} />
         <Route path="/campaigns/add" element={<CampaignForm />} />
+        <Route path="/chat" element={<ChatBox />} />
         <Route path="/signup" element={<Signup handleSignup={handleSignup} />} />
         <Route path="/login" element={<Login handleLogin={handleLogin} />}/>
       </Routes>
