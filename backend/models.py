@@ -270,40 +270,39 @@ class Campaign(db.Model):
         db.session.commit()
         return new_campaign
 
-    def modify_campaign(campaign, data):
+    def modify_campaign(self, data):
         """modify a campaign"""
             
         customer_segment_id = Customer_segment.query.filter_by(name=data['customer_segment']).first().id
         target_audience_id = Target_audience.query.filter_by(name=data['target_audience']).first().id
 
-        campaign.name = data['name']
-        campaign.start_date = data['start_date']
-        campaign.duration = data['duration']
-        campaign.customer_segment_id = customer_segment_id
-        campaign.target_audience_id = target_audience_id
-        campaign.spend_email = data.get('spend_email', 0)
-        campaign.spend_facebook = data.get('spend_facebook', 0)
-        campaign.spend_google_ads = data.get('spend_google_ads', 0)
-        campaign.spend_instagram = data.get('spend_instagram', 0)
-        campaign.spend_website = data.get('spend_website', 0)
-        campaign.spend_youtube = data.get('spend_youtube', 0)
-        campaign.projected_revenue_email = data.get('projected_revenue_email', 0)
-        campaign.projected_revenue_facebook = data.get('projected_revenue_facebook', 0)
-        campaign.projected_revenue_google_ads = data.get('projected_revenue_google_ads', 0)
-        campaign.projected_revenue_instagram = data.get('projected_revenue_instagram', 0)
-        campaign.projected_revenue_website = data.get('projected_revenue_website', 0)
-        campaign.projected_revenue_youtube = data.get('projected_revenue_youtube', 0)
-        campaign.actual_revenue_email = data.get('actual_revenue_email', 0)
-        campaign.actual_revenue_facebook = data.get('actual_revenue_facebook', 0)
-        campaign.actual_revenue_google_ads = data.get('actual_revenue_google_ads', 0)
-        campaign.actual_revenue_instagram = data.get('actual_revenue_instagram', 0)
-        campaign.actual_revenue_website = data.get('actual_revenue_website', 0)
-        campaign.actual_revenue_youtube = data.get('actual_revenue_youtube', 0)
-        campaign.impressions = data.get('impressions', 0)
-        campaign.clicks = data.get('clicks', 0)
+        self.name = data['name']
+        self.start_date = data['start_date']
+        self.duration = data['duration']
+        self.customer_segment_id = customer_segment_id
+        self.target_audience_id = target_audience_id
+        self.spend_email = data.get('spend_email', 0)
+        self.spend_facebook = data.get('spend_facebook', 0)
+        self.spend_google_ads = data.get('spend_google_ads', 0)
+        self.spend_instagram = data.get('spend_instagram', 0)
+        self.spend_website = data.get('spend_website', 0)
+        self.spend_youtube = data.get('spend_youtube', 0)
+        self.projected_revenue_email = data.get('projected_revenue_email', 0)
+        self.projected_revenue_facebook = data.get('projected_revenue_facebook', 0)
+        self.projected_revenue_google_ads = data.get('projected_revenue_google_ads', 0)
+        self.projected_revenue_instagram = data.get('projected_revenue_instagram', 0)
+        self.projected_revenue_website = data.get('projected_revenue_website', 0)
+        self.projected_revenue_youtube = data.get('projected_revenue_youtube', 0)
+        self.actual_revenue_email = data.get('actual_revenue_email', 0)
+        self.actual_revenue_facebook = data.get('actual_revenue_facebook', 0)
+        self.actual_revenue_google_ads = data.get('actual_revenue_google_ads', 0)
+        self.actual_revenue_instagram = data.get('actual_revenue_instagram', 0)
+        self.actual_revenue_website = data.get('actual_revenue_website', 0)
+        self.actual_revenue_youtube = data.get('actual_revenue_youtube', 0)
+        self.impressions = data.get('impressions', 0)
+        self.clicks = data.get('clicks', 0)
     
         db.session.commit()
-        return campaign
 
 
 

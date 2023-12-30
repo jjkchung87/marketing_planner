@@ -126,7 +126,7 @@ def get_user(id):
     return jsonify(user=user.serialize()), 200
 
 # #*******************************************************************************************************************************
-# NEW CAMPAIGN
+# ADD CAMPAIGN
 # #*******************************************************************************************************************************
 
 @app.route('/api/campaigns', methods=['POST'])
@@ -159,7 +159,7 @@ def new_campaign():
     campaign = Campaign.add_new_campaign(data)
 
     # Return predictions
-    return jsonify({"campaign": campaign.serialize()}), 200
+    return jsonify(campaign=campaign.serialize()), 200
 
 
 # #*******************************************************************************************************************************
@@ -248,8 +248,11 @@ def modify_campaign(id):
     data = {**data, **prediction}
 
     # Modify campaign
-    campaign = Campaign.modify_campaign(campaign, data)
+    campaign.modify_campaign(data)
 
+    # Retrieve modified campaign
+    campaign = Campaign.query.get_or_404(id)
+    
     # Return campaign
     return jsonify(campaign=campaign.serialize()), 200
 

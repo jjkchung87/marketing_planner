@@ -6,7 +6,7 @@ import Navbar from './components/Navbar';
 import Sidebarnav from './components/Sidebarnav';
 import './App.css';
 import Campaign from './pages/campaign-list/CampaignList';
-import CampaignList from './pages/campaign-list/CampaignList';
+import CampaignList from './pages/campaign-list/CampaignList2';
 import Home from './pages/home/Home';
 import CampaignForm from './pages/campaign-manager/CampaignForm';
 import ChatBox from './pages/chat/ChatBox';

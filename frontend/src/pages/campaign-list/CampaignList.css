@@ -1,18 +1,31 @@
-.smallCell {
-    padding: 6px 8px;
-    font-size: 0.75rem;
-  }
-  
-  .mediumCell {
-    padding: 6px 10px;
-    font-size: 0.75rem;
-    width: 100px; /* Adjust the width as needed */
-  }
-  
-  /* You can also target the input fields within the cells to make them smaller */
-  .smallCell .MuiInputBase-input,
-  .mediumCell .MuiInputBase-input {
-    font-size: 0.75rem;
-    padding: 6px; /* Adjust padding as needed */
-  }
-  
+
+
+
+.campaign-manager-chart {
+  height: 50vh;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 1; /* Ensure it's above the table */
+}
+
+.campaign-manager-table {
+  height: 50vh;
+  margin-top: 50vh; 
+  overflow-y: auto;
+  padding-bottom: 1rem; 
+}
+
+
+
+.campaign-list-item-input {
+  border: none;
+}
+
+.campaign-list-item-select {
+  border: none;
+}
+
+.campaign-list-item-input[type="number"] {
+  width: 60px;  /* or any width you prefer */
+}
