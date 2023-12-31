@@ -70,8 +70,8 @@ const MonthlyChart: React.FC<MonthlyChartProps> = ({ campaigns }) => {
 
         // Sort graphDataArray by yearMonth in ascending order
         graphDataArray.sort((a:any, b:any) => {
-            if (a.yearMonth < b.yearMonth) return -1;
-            if (a.yearMonth > b.yearMonth) return 1;
+            if (a.month < b.month) return -1;
+            if (a.month > b.month) return 1;
             return 0;
         }
         );
@@ -83,23 +83,26 @@ const MonthlyChart: React.FC<MonthlyChartProps> = ({ campaigns }) => {
       
     const data = generateMonthlySummary(campaigns);
 
-    console.log(data);
+    const filteredData = data.filter((item:any) => {
+        return item.month.includes("2023");    });
+
+    console.log(filteredData);
       
                
 
         return (
             <div className="monthly-chart">
                     <BarChart
-                        width={1000}
+                        width={1300}
                         height={500}
-                        data={data}
+                        data={filteredData}
                         margin={{
                         top: 5,
                         right: 30,
                         left: 20,
                         bottom: 5
                         }}
-                        barSize={20}
+                        barSize={5}
                     >
                         <XAxis dataKey="month" scale="point" padding={{ left: 10, right: 10 }} />
                         <YAxis />

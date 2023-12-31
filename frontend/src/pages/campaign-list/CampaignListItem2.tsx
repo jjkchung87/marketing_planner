@@ -5,9 +5,9 @@ import { CampaignType, CampaignFormData } from '../../types/types';
 import "./CampaignList.css";
 
 type CampaignListItemProps = {
-campaign: CampaignType;
-updateCampaign: (id: number, data: CampaignFormData) => void;
-deleteCampaign: (id: number) => void;
+	campaign: CampaignType;
+	updateCampaign: (id: number, data: CampaignFormData) => void;
+	deleteCampaign: (id: number) => void;
 };
 
 

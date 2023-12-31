@@ -2,20 +2,21 @@
 
 
 .campaign-manager-chart {
-  height: 50vh;
+  height: 50vh; /* Half of the viewport height */
   position: fixed;
   width: 100%;
   top: 0;
-  z-index: 1; /* Ensure it's above the table */
 }
 
 .campaign-manager-table {
-  height: 50vh;
-  margin-top: 50vh; 
-  overflow-y: auto;
-  padding-bottom: 1rem; 
+  height: 50vh; /* Half of the viewport height */
+  overflow-y: scroll;
+  margin-top: 50vh;
 }
 
+.campaign-manager-container {
+  width: 100%;
+}
 
 
 .campaign-list-item-input {

@@ -7,10 +7,11 @@ import "./CampaignList.css";
 import CampaignListItem from './CampaignListItem2';
 import MonthlyChart from './MonthlyChart';
 import AddCampaignModal from './AddCampaignModal';
+import CampaignListFilter from './CampaignListFilter'
 
 
 
-const CampaignManager = () => {
+const CampaignList = () => {
 
 
   const [isLoading, setIsLoading] = useState(true);
@@ -81,7 +82,6 @@ const CampaignManager = () => {
     }
   };
 
-
   
   const tableHeaders = ['Campaign Name', 'Start Date', 'Duration', 'Customer Segment', 'Target Audience', 'Email Spend', 'Facebook Spend', 'Google Spend', 'Instagram Spend', 'Website Spend', 'Youtube Spend', 'Total Spend', 'Projected Revenue', 'Actual Revenue', 'Edit', 'Delete']
 
@@ -89,14 +89,17 @@ const CampaignManager = () => {
   if(isLoading) return <h1>Loading...</h1>
 
   return (
-    <div className="campaign-manager-container">
+    <div className="campaign-list-container">
     <Grid divided="vertically">
-      <Grid.Row className="campaign-manager-chart">
+      <Grid.Row className="campaign-list-chart">
         <MonthlyChart campaigns={campaigns}/>
 
         <AddCampaignModal addCampaign={addCampaign}/>
       </Grid.Row>
-      <Grid.Row className="campaign-manager-table">
+      <Grid.Row className="campaign-list-filter">
+        <CampaignListFilter campaigns={campaigns} setCampaigns={setCampaigns}/>
+      </Grid.Row>
+      <Grid.Row className="campaign-list-table">
         <Table  sortable compact >
         <Table.Header className="fixed-header" >
           <Table.Row>
@@ -117,4 +120,4 @@ const CampaignManager = () => {
   );
 };
 
-export default CampaignManager;
+export default CampaignList;
