@@ -1,190 +1,120 @@
 import React, { useState, useEffect, ChangeEvent } from 'react';
-import { useParams } from 'react-router-dom';
-import CampaignForm from '../campaign-manager/CampaignForm';
-import BarChart from '../campaign-manager/CampaignBarChart';
-import Insights from '../campaign-manager/CampaignInsights';
 import UserApi from '../../api';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Unstable_Grid2';
-import { Table, TableBody, TableCell as MuiTableCell, TableContainer, TableHead, TableRow, TextField as MuiTextField, Button } from '@mui/material';
-import { styled } from '@mui/system'
+import { Table } from 'semantic-ui-react'
 import { CampaignType, CampaignFormData } from '../../types/types';
 import "./CampaignList.css";
 
-// Define your styled components
-const StyledTableCell = styled(MuiTableCell)({
-    padding: '6px 8px', // Smaller padding
-    fontSize: '0.75rem', // Smaller font size
-    '&:last-child': {
-      paddingRight: '6px', // Adjust padding for the last cell
-    },
-  });
-  
-  const StyledTextField = styled(MuiTextField)({
-    '& .MuiInputBase-input': {
-      fontSize: '0.75rem', // Smaller font size
-      padding: '6px', // Adjust padding to fit the smaller cell
-    },
-  });
-  
-  // Narrower cells for Duration, Spend, and Revenue columns
-  const NarrowCell = styled(StyledTableCell)({
-    width: '64px',
-  });
-  
-  const NarrowTextField = styled(StyledTextField)({
-    '& .MuiInputBase-input': {
-      width: '64px',
-    },
-  });
-  
-  type CampaignListItemProps = {
-    campaign: CampaignType;
-  };
+type CampaignListItemProps = {
+	campaign: CampaignType;
+	updateCampaign: (id: number, data: CampaignFormData) => void;
+	deleteCampaign: (id: number) => void;
+};
 
 
-  const CampaignListItem: React.FC<CampaignListItemProps> = ({campaign}) => {
+const CampaignListItem: React.FC<CampaignListItemProps> = ({ campaign, updateCampaign, deleteCampaign }) => {
 
-    const [campaignData, setCampaignData] = useState<CampaignType | null>(null);
-
-    useEffect(() => {
-        setCampaignData(campaign)
-    }, [campaignData])
+	const [editing, setEditing] = useState<boolean>(false);
 
 
-    const [campaignFormData, setCampaignFormData] = useState<CampaignFormData | null>({
-        name:campaign.name || null,
-        start_date:campaign.start_date || null,
-        duration:campaign.duration || null,
-        customer_segment:campaign.customer_segment || null,
-        target_audience:campaign.target_audience || null,
-        spend_email:campaign.spend_email || null,
-        spend_facebook:campaign.spend_facebook || null,
-        spend_google_ads:campaign.spend_google_ads || null,
-        spend_instagram:campaign.spend_instagram || null,
-        spend_website:campaign.spend_website || null,
-        spend_youtube:campaign.spend_youtube || null
-    });
+	const [campaignFormData, setCampaignFormData] = useState<CampaignFormData>({
+	name: campaign.name || '',
+	start_date: campaign.start_date || '',
+	duration: campaign.duration || 0,
+	customer_segment: campaign.customer_segment || '',
+	target_audience: campaign.target_audience || '',
+	spend_email: campaign.spend_email || 0,
+	spend_facebook: campaign.spend_facebook || 0,
+	spend_google_ads: campaign.spend_google_ads || 0,
+	spend_instagram: campaign.spend_instagram || 0,
+	spend_website: campaign.spend_website || 0,
+	spend_youtube: campaign.spend_youtube || 0
+});
+
+const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+	const { name, value } = e.target;
+	setCampaignFormData(prevFormData => ({
+	...prevFormData,
+	[name]: value
+	}));
+};
+
+const handleSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
+	const { name, value } = e.target;
+	setCampaignFormData(prevFormData => ({
+	...prevFormData,
+	[name]: value,
+	}));
+};
+
+const handleUpdate = async () => {
+	if (!campaignFormData) return console.error('Campaign form data not found');
+	updateCampaign(campaign.id, campaignFormData)
+	setEditing(false);
+};
+
+const handleDelete = async () => {
+	deleteCampaign(campaign.id)
+};
 
 
-    const handleChange = (e:ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
 
-        const { name, value } = e.target;
-        setCampaignFormData((prevFormData) => ({
-          ...prevFormData as CampaignFormData,
-          [name]: value
-        }));
-      }
+const customerSegments = ["Fashionistas", 
+							"Foodies", 
+							"Health & Wellness",
+							"Outdoor Adventurers", 
+							"Tech Enthusiasts"
+							]
+const targetAudiences = ["All Ages", 
+							"Men 18-24", 
+							"Men 25-34", 
+							"Women 25-34", 
+							"Women 35-44"]
+
+return (
+	<Table.Row key={campaign.id} className={editing ? "edit-mode": ""}>
+		<Table.Cell collapsing>{editing ? <input className="campaign-list-item-input" type="text" value={campaignFormData.name || ''} name="name" onChange={handleChange}/>: campaignFormData.name}</Table.Cell>
+		<Table.Cell collapsing>{editing ? <input className="campaign-list-item-input" type="date" value={campaignFormData.start_date || ''} name="start_date" onChange={handleChange}/>: campaignFormData.start_date}</Table.Cell>
+		<Table.Cell collapsing>{editing ? <input className="campaign-list-item-input" type="number" value={campaignFormData.duration || ''} name="duration" onChange={handleChange}/>: campaignFormData.duration}</Table.Cell>
+		<Table.Cell collapsing>{editing ? <select
+			className="campaign-list-item-select"
+			name="customer_segment"
+			value={campaignFormData.customer_segment || ''}
+			onChange={handleSelectChange}
+		>
+			{customerSegments.map(segment => (
+			<option key={segment} value={segment}>
+				{segment}
+			</option>
+			))}
+		</select>: campaignFormData.customer_segment}</Table.Cell>
+		<Table.Cell collapsing>{editing ? <select
+			className="campaign-list-item-select"
+			name="target_audience"
+			value={campaignFormData.target_audience || ''}
+			onChange={handleSelectChange}
+		>
+			{targetAudiences.map(audience => (
+			<option key={audience} value={audience}>
+				{audience}
+			</option>
+			))}
+		</select>: campaignFormData.target_audience}</Table.Cell>
+		<Table.Cell collapsing>{editing ? <input className="campaign-list-item-input" type="number" value={campaignFormData.spend_email || ''} name="spend_email" onChange={handleChange}/>: campaignFormData.spend_email}</Table.Cell>
+		<Table.Cell collapsing>{editing ? <input className="campaign-list-item-input" type="number" value={campaignFormData.spend_facebook || ''} name="spend_facebook" onChange={handleChange}/>: campaignFormData.spend_facebook}</Table.Cell>
+		<Table.Cell collapsing>{editing ? <input className="campaign-list-item-input" type="number" value={campaignFormData.spend_google_ads || ''} name="spend_google_ads" onChange={handleChange}/>: campaignFormData.spend_google_ads}</Table.Cell>
+		<Table.Cell collapsing>{editing ? <input className="campaign-list-item-input" type="number" value={campaignFormData.spend_instagram || ''} name="spend_instagram" onChange={handleChange}/>: campaignFormData.spend_instagram}</Table.Cell>
+		<Table.Cell collapsing>{editing ? <input className="campaign-list-item-input" type="number" value={campaignFormData.spend_website || ''} name="spend_website" onChange={handleChange}/>: campaignFormData.spend_website}</Table.Cell>
+		<Table.Cell collapsing>{editing ? <input className="campaign-list-item-input" type="number" value={campaignFormData.spend_youtube || ''} name="spend_youtube" onChange={handleChange}/>: campaignFormData.spend_youtube}</Table.Cell>
+		<Table.Cell collapsing>${campaign.spend_total}</Table.Cell>
+		<Table.Cell collapsing>${Math.floor(campaign.projected_revenue_total)}</Table.Cell>
+		<Table.Cell collapsing>${Math.floor(campaign.actual_total_revenue)}</Table.Cell>
+		<Table.Cell collapsing>{editing ? <button onClick={() => handleUpdate()}>Update</button>: <button onClick={() => setEditing(true)}>Edit</button>}</Table.Cell>
+		<Table.Cell collapsing><button onClick={() => handleDelete()}>Delete</button></Table.Cell>
 
 
-    const handleUpdate = async () => {
-        if(!campaignFormData) return console.error('Campaign form data not found')
-        const updated_campaign = await UserApi.updateCampaign(campaign.id, campaignFormData)
+	</Table.Row>
+)
 
-        setCampaignData(updated_campaign)
+}
 
-    }
-
-
-    return (
-        <TableRow key={campaign.id}>
-        <StyledTableCell>
-          <StyledTextField
-            type="text"
-            name="name"
-            value={campaign.name}
-            onChange={(e) => handleChange(e)}
-          />
-          </StyledTableCell>
-        <StyledTableCell>
-          <StyledTextField
-            type="date"
-            name="start_date"
-            value={campaign.start_date}
-            onChange={(e) => handleChange(e)}
-          />
-        </StyledTableCell>
-        <StyledTableCell>
-          <StyledTextField
-            type="number"
-            name="duration"
-            value={campaign.duration}
-            onChange={(e) => handleChange(e)}
-          />
-        </StyledTableCell>
-        <StyledTableCell>
-          <StyledTextField
-            type="text"
-            name="customer_segment"
-            value={campaign.customer_segment}
-            onChange={(e) => handleChange(e)}
-          />
-        </StyledTableCell>
-        <StyledTableCell>
-          <StyledTextField
-            type="text"
-            name="target_audience"
-            value={campaign.target_audience}
-            onChange={(e) => handleChange(e)}
-          />
-        </StyledTableCell>
-        <StyledTableCell>
-          <StyledTextField
-            type="number"
-            name="spend_email"
-            value={campaign.spend_email}
-            onChange={(e) => handleChange(e)}
-          />
-        </StyledTableCell>
-        <StyledTableCell>
-          <StyledTextField
-            type="number"
-            name="spend_facebook"
-            value={campaign.spend_facebook}
-            onChange={(e) => handleChange(e)}
-          />
-        </StyledTableCell>
-        <StyledTableCell>
-          <StyledTextField
-            type="number"
-            name="spend_google_ads"
-            value={campaign.spend_google_ads}
-            onChange={(e) => handleChange(e)}
-          />
-        </StyledTableCell>
-        <StyledTableCell>
-          <StyledTextField
-            type="number"
-            name="spend_instagram"
-            value={campaign.spend_instagram}
-            onChange={(e) => handleChange(e)}
-          />
-        </StyledTableCell>
-        <StyledTableCell>
-          <StyledTextField
-            type="number"
-            name="spend_website"
-            value={campaign.spend_website}
-            onChange={(e) => handleChange(e)}
-          />
-        </StyledTableCell>
-        <StyledTableCell>
-          <StyledTextField
-            type="number"
-            name="spend_youtube"
-            value={campaign.spend_youtube}
-            onChange={(e) => handleChange(e)}
-          />
-        </StyledTableCell>
-        <StyledTableCell>${campaign.spend_total}</StyledTableCell>
-        <StyledTableCell>${Math.floor(campaign.projected_revenue_total)}</StyledTableCell>
-        <StyledTableCell>${Math.floor(campaign.actual_total_revenue)}</StyledTableCell>
-        <StyledTableCell>
-          <Button onClick={() => handleUpdate()}>Update</Button>
-        </StyledTableCell>
-      </TableRow>
-    )
-
-  }
-
-  export default CampaignListItem;
+export default CampaignListItem;

@@ -1,0 +1,19 @@
+.CampaignListFilter {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around; /* Adjust this as needed */
+    align-items: center;
+    gap: 10px; /* Adjust the spacing between dropdowns */
+  }
+  
+  .CampaignListFilter .filter-header {
+    flex-basis: 100%;
+    text-align: center;
+  }
+  
+  .CampaignListFilter .dropdown-container {
+    flex-grow: 1;
+    min-width: 100px; /* Adjust minimum width of dropdown as needed */
+    max-width: 200px; /* Adjust maximum width of dropdown as needed */
+  }
+  
