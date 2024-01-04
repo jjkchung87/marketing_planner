@@ -1,19 +1,20 @@
-import React, { useState, useEffect, ChangeEvent } from 'react';
+import React, { useState, useEffect, ChangeEvent, useContext} from 'react';
 import UserApi from '../../api';
 import { Table } from 'semantic-ui-react'
 import { CampaignType, CampaignFormData } from '../../types/types';
 import "./CampaignList.css";
+import campaignsContext from '../../context/CampaignsContext';
+import UpdateCampaignModal from './UpdateCampaignModal';
 
 type CampaignListItemProps = {
 	campaign: CampaignType;
-	updateCampaign: (id: number, data: CampaignFormData) => void;
-	deleteCampaign: (id: number) => void;
 };
 
 
-const CampaignListItem: React.FC<CampaignListItemProps> = ({ campaign, updateCampaign, deleteCampaign }) => {
+const CampaignListItem: React.FC<CampaignListItemProps> = ({ campaign }) => {
 
-	const [editing, setEditing] = useState<boolean>(false);
+	const { updateCampaign, deleteCampaign} = useContext(campaignsContext);
+	const [isModalOpen, setIsModalOpen] = useState(false);
 
 
 	const [campaignFormData, setCampaignFormData] = useState<CampaignFormData>({
@@ -46,17 +47,34 @@ const handleSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
 	}));
 };
 
-const handleUpdate = async () => {
-	if (!campaignFormData) return console.error('Campaign form data not found');
-	updateCampaign(campaign.id, campaignFormData)
-	setEditing(false);
-};
 
 const handleDelete = async () => {
 	deleteCampaign(campaign.id)
 };
 
+const openUpdateCampaignModal = () => {
+    setIsModalOpen(true);
+  };
 
+  const closeUpdateCampaignModal = () => {
+    setIsModalOpen(false);
+  };
+
+// isEditable if campaign start date is in the future
+const isEditable = () => {
+	const today = new Date();
+	const startDate = new Date(campaign.start_date);
+	return startDate > today;
+}
+
+const formatCurrency = (amount: number) => {
+	return new Intl.NumberFormat('en-US', {
+	  style: 'currency',
+	  currency: 'USD',
+	  minimumFractionDigits: 0, // No decimal places
+	  maximumFractionDigits: 0, // No decimal places
+	}).format(amount);
+  };
 
 const customerSegments = ["Fashionistas", 
 							"Foodies", 
@@ -70,8 +88,56 @@ const targetAudiences = ["All Ages",
 							"Women 25-34", 
 							"Women 35-44"]
 
+
+
+
+
 return (
-	<Table.Row key={campaign.id} className={editing ? "edit-mode": ""}>
+	<>
+		<Table.Row key={campaign.id} >
+			<Table.Cell collapsing>{ campaign.name}</Table.Cell>
+			<Table.Cell collapsing>{ campaign.start_date}</Table.Cell>
+			<Table.Cell collapsing>{ campaign.duration}</Table.Cell>
+			<Table.Cell collapsing>{ campaign.customer_segment}</Table.Cell>
+			<Table.Cell collapsing>{ campaign.target_audience}</Table.Cell>
+			<Table.Cell collapsing>{ formatCurrency(campaign.spend_email)}</Table.Cell>
+			<Table.Cell collapsing>{ formatCurrency(campaign.spend_facebook)}</Table.Cell>
+			<Table.Cell collapsing>{ formatCurrency(campaign.spend_google_ads)}</Table.Cell>
+			<Table.Cell collapsing>{ formatCurrency(campaign.spend_instagram)}</Table.Cell>
+			<Table.Cell collapsing>{ formatCurrency(campaign.spend_website)}</Table.Cell>
+			<Table.Cell collapsing>{ formatCurrency(campaign.spend_youtube)}</Table.Cell>
+			<Table.Cell collapsing>{formatCurrency(campaign.spend_total)}</Table.Cell>
+			<Table.Cell collapsing>{formatCurrency(Math.floor(campaign.projected_revenue_total))}</Table.Cell>
+			<Table.Cell collapsing>{formatCurrency(Math.floor(campaign.actual_total_revenue))}</Table.Cell>
+			{isEditable() ? <Table.Cell collapsing>{ <button onClick={openUpdateCampaignModal}>Edit</button>}</Table.Cell>
+			: <Table.Cell collapsing> - </Table.Cell>}
+			<Table.Cell collapsing><button onClick={() => handleDelete()}>Delete</button></Table.Cell>
+		</Table.Row>
+
+		{isModalOpen && (
+			<UpdateCampaignModal
+				campaign={campaign}
+				updateCampaign={updateCampaign}
+				closeModal={closeUpdateCampaignModal}
+				open
+			/>
+		)}
+	</>
+	
+)
+
+}
+
+export default CampaignListItem;
+
+{/* <Table.Cell collapsing>{editing ? <input className="campaign-list-item-input" type="number" value={campaignFormData.spend_email || ''} name="spend_email" onChange={handleChange}/>: `$${campaignFormData.spend_email}`}</Table.Cell>
+<Table.Cell collapsing>{editing ? <input className="campaign-list-item-input" type="number" value={campaignFormData.spend_facebook || ''} name="spend_facebook" onChange={handleChange}/>: campaignFormData.spend_facebook}</Table.Cell>
+<Table.Cell collapsing>{editing ? <input className="campaign-list-item-input" type="number" value={campaignFormData.spend_google_ads || ''} name="spend_google_ads" onChange={handleChange}/>: campaignFormData.spend_google_ads}</Table.Cell>
+<Table.Cell collapsing>{editing ? <input className="campaign-list-item-input" type="number" value={campaignFormData.spend_instagram || ''} name="spend_instagram" onChange={handleChange}/>: campaignFormData.spend_instagram}</Table.Cell>
+<Table.Cell collapsing>{editing ? <input className="campaign-list-item-input" type="number" value={campaignFormData.spend_website || ''} name="spend_website" onChange={handleChange}/>: campaignFormData.spend_website}</Table.Cell>
+<Table.Cell collapsing>{editing ? <input className="campaign-list-item-input" type="number" value={campaignFormData.spend_youtube || ''} name="spend_youtube" onChange={handleChange}/>: campaignFormData.spend_youtube}</Table.Cell> */}
+
+{/* <Table.Row key={campaign.id} className={editing ? "edit-mode": ""}>
 		<Table.Cell collapsing>{editing ? <input className="campaign-list-item-input" type="text" value={campaignFormData.name || ''} name="name" onChange={handleChange}/>: campaignFormData.name}</Table.Cell>
 		<Table.Cell collapsing>{editing ? <input className="campaign-list-item-input" type="date" value={campaignFormData.start_date || ''} name="start_date" onChange={handleChange}/>: campaignFormData.start_date}</Table.Cell>
 		<Table.Cell collapsing>{editing ? <input className="campaign-list-item-input" type="number" value={campaignFormData.duration || ''} name="duration" onChange={handleChange}/>: campaignFormData.duration}</Table.Cell>
@@ -99,22 +165,17 @@ return (
 			</option>
 			))}
 		</select>: campaignFormData.target_audience}</Table.Cell>
-		<Table.Cell collapsing>{editing ? <input className="campaign-list-item-input" type="number" value={campaignFormData.spend_email || ''} name="spend_email" onChange={handleChange}/>: campaignFormData.spend_email}</Table.Cell>
-		<Table.Cell collapsing>{editing ? <input className="campaign-list-item-input" type="number" value={campaignFormData.spend_facebook || ''} name="spend_facebook" onChange={handleChange}/>: campaignFormData.spend_facebook}</Table.Cell>
-		<Table.Cell collapsing>{editing ? <input className="campaign-list-item-input" type="number" value={campaignFormData.spend_google_ads || ''} name="spend_google_ads" onChange={handleChange}/>: campaignFormData.spend_google_ads}</Table.Cell>
-		<Table.Cell collapsing>{editing ? <input className="campaign-list-item-input" type="number" value={campaignFormData.spend_instagram || ''} name="spend_instagram" onChange={handleChange}/>: campaignFormData.spend_instagram}</Table.Cell>
-		<Table.Cell collapsing>{editing ? <input className="campaign-list-item-input" type="number" value={campaignFormData.spend_website || ''} name="spend_website" onChange={handleChange}/>: campaignFormData.spend_website}</Table.Cell>
-		<Table.Cell collapsing>{editing ? <input className="campaign-list-item-input" type="number" value={campaignFormData.spend_youtube || ''} name="spend_youtube" onChange={handleChange}/>: campaignFormData.spend_youtube}</Table.Cell>
+		<Table.Cell collapsing>{ `$${campaignFormData.spend_email}`}</Table.Cell>
+		<Table.Cell collapsing>{ `$${campaignFormData.spend_facebook}`}</Table.Cell>
+		<Table.Cell collapsing>{ `$${campaignFormData.spend_google_ads}`}</Table.Cell>
+		<Table.Cell collapsing>{ `$${campaignFormData.spend_instagram}`}</Table.Cell>
+		<Table.Cell collapsing>{ `$${campaignFormData.spend_website}`}</Table.Cell>
+		<Table.Cell collapsing>{ `$${campaignFormData.spend_youtube}`}</Table.Cell>
 		<Table.Cell collapsing>${campaign.spend_total}</Table.Cell>
 		<Table.Cell collapsing>${Math.floor(campaign.projected_revenue_total)}</Table.Cell>
 		<Table.Cell collapsing>${Math.floor(campaign.actual_total_revenue)}</Table.Cell>
-		<Table.Cell collapsing>{editing ? <button onClick={() => handleUpdate()}>Update</button>: <button onClick={() => setEditing(true)}>Edit</button>}</Table.Cell>
+		<Table.Cell collapsing>{ <button onClick={() => setEditing(true)}>Edit</button>}</Table.Cell>
 		<Table.Cell collapsing><button onClick={() => handleDelete()}>Delete</button></Table.Cell>
 
 
-	</Table.Row>
-)
-
-}
-
-export default CampaignListItem;
+	</Table.Row> */}

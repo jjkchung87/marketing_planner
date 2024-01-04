@@ -2,24 +2,44 @@ import React, {useState} from 'react';
 import { Button, Header, Modal, Form, Input, Icon } from 'semantic-ui-react'
 import { customerSegments, targetAudiences, fieldNames } from '../../utils/commonVariables';
 
-function AddCampaignModal({addCampaign}) {
+function UpdateCampaignModal({campaign, updateCampaign, closeModal, open}) {
   
-  const initialFormState= {
-    name: 'Test Campaign',
-    start_date: '2023-12-31',
-    duration: 60,
-    customer_segment: '',
-    target_audience: '',
-    spend_email: 1000,
-    spend_facebook: 1100,
-    spend_google_ads: 1200,
-    spend_instagram: 1300,
-    spend_website: 1500,
-    spend_youtube: 2000,
-};
+  const initialCampaignState= {
+    name: campaign.name,
+    start_date: campaign.start_date,
+    duration: campaign.duration,
+    customer_segment: campaign.customer_segment,
+    target_audience: campaign.target_audience,
+    spend_email: campaign.spend_email,
+    spend_facebook: campaign.spend_facebook,
+    spend_google_ads: campaign.spend_google_ads,
+    spend_instagram: campaign.spend_instagram,
+    spend_website: campaign.spend_website,
+    spend_youtube: campaign.spend_youtube,
+    spend_total: campaign.spend_total,
+    projected_revenue_email: campaign.projected_revenue_email,
+    projected_revenue_facebook: campaign.projected_revenue_facebook,
+    projected_revenue_google_ads: campaign.projected_revenue_google_ads,
+    projected_revenue_instagram: campaign.projected_revenue_instagram,
+    projected_revenue_website: campaign.projected_revenue_website,
+    projected_revenue_youtube: campaign.projected_revenue_youtube,
+    projected_revenue_total: campaign.projected_revenue_total
+    };
+
   
-  const [open, setOpen] = useState(false)
-  const [formData, setFormData] = useState(initialFormState);
+  const [formData, setFormData] = useState({
+    name: campaign.name,
+    start_date: campaign.start_date,
+    duration: campaign.duration,
+    customer_segment: campaign.customer_segment,
+    target_audience: campaign.target_audience,
+    spend_email: campaign.spend_email,
+    spend_google_ads: campaign.spend_google_ads,
+    spend_facebook: campaign.spend_facebook,
+    spend_instagram: campaign.spend_instagram,
+    spend_website: campaign.spend_website,
+    spend_youtube: campaign.spend_youtube
+  });
 
   const handleChange = (evt) => {
     const { name, value } = evt.target;
@@ -31,13 +51,11 @@ function AddCampaignModal({addCampaign}) {
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
-    addCampaign(formData);
-    setFormData(initialFormState);
-    setOpen(false)
+    updateCampaign(formData);
   };
 
   const generateInputFields = () => {
-      return fieldNames.map((fieldName, index) => (
+      return fieldNames.map((fieldName) => (
           <Form.Field key={fieldName}>
               <label>{fieldName}</label>
               {fieldName === 'customer_segment' ? (
@@ -83,19 +101,17 @@ function AddCampaignModal({addCampaign}) {
 
     <Modal
       closeIcon
-      onClose={() => setOpen(false)}
-      onOpen={() => setOpen(true)}
+      onClose={closeModal}
       open={open}
-      trigger={<Button>Add new campaign</Button>}
     >
-      <Modal.Header>Add new campaign</Modal.Header>
+      <Modal.Header>Update Campaign</Modal.Header>
       <Modal.Content scrolling>
         <Modal.Description>
           <Header>Enter campaign details</Header>
         </Modal.Description>
         <Form className="campaign-form" onSubmit={handleSubmit}>
           {inputFields}
-          <Button color='red' onClick={() => setOpen(false)}>
+          <Button color='red' onClick={closeModal}>
           <Icon name='remove' /> Cancel
           </Button>
           <Button type="submit" primary>
@@ -109,4 +125,4 @@ function AddCampaignModal({addCampaign}) {
   )
 }
 
-export default AddCampaignModal;
+export default UpdateCampaignModal;

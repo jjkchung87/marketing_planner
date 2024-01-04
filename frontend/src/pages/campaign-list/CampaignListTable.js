@@ -20,7 +20,7 @@ const CampaignListTable = () => {
                 </Table.Header>
                 <Table.Body className="scrollable-body">
                     {filteredCampaigns && filteredCampaigns.map((campaign) => (
-                    <CampaignListItem campaign={campaign} updateCampaign={updateCampaign} deleteCampaign={deleteCampaign}/>
+                    <CampaignListItem campaign={campaign} key={campaign.id}/>
                     ))}
                 </Table.Body>
             </Table>

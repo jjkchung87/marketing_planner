@@ -106,7 +106,7 @@ const CampaignListArea = () => {
 		});
 		}
 		if (filter.duration.length > 0) {
-		filteredCampaigns = filteredCampaigns.filter((campaign) => filter.duration.includes(campaign.duration.toString()));
+		filteredCampaigns = filteredCampaigns.filter((campaign) => filter.duration.includes(campaign.duration));
 		}
 
 		setFilteredCampaigns(filteredCampaigns);
